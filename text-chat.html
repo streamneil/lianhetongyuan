@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文本对话 - 联核通元</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        * {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+
+        /* 科技蓝渐变背景 */
+        .gradient-bg-blue {
+            background: linear-gradient(135deg, #5B8FF9 0%, #00C9FF 50%, #0081FF 100%);
+            box-shadow: 0 8px 24px rgba(91, 143, 249, 0.25);
+        }
+
+        .gradient-bg-sidebar {
+            background: linear-gradient(145deg, #FAFBFF 0%, #F5F7FF 50%, #EEF2FF 100%);
+            position: relative;
+        }
+
+        .gradient-bg-sidebar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 200px;
+            background: radial-gradient(ellipse at top left, rgba(91, 143, 249, 0.08) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        /* 左侧菜单项样式 */
+        .nav-item {
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            margin: 3px 8px;
+            border-radius: 10px;
+            cursor: pointer;
+            color: #5A6C84;
+            font-size: 14px;
+            font-weight: 500;
+            text-decoration: none;
+        }
+
+        .nav-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 0;
+            height: 0;
+            background: linear-gradient(180deg, #5B8FF9 0%, #00C9FF 100%);
+            border-radius: 0 4px 4px 0;
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .nav-item:hover {
+            background: linear-gradient(135deg, rgba(91, 143, 249, 0.08) 0%, rgba(0, 201, 255, 0.05) 100%);
+            color: #5B8FF9;
+            transform: translateX(2px);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(135deg, rgba(91, 143, 249, 0.15) 0%, rgba(0, 201, 255, 0.12) 100%);
+            color: #5B8FF9;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(91, 143, 249, 0.12);
+        }
+
+        .nav-item.active::before {
+            width: 4px;
+            height: 70%;
+        }
+
+        .nav-icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 12px;
+        }
+
+        .nav-group-title {
+            font-size: 12px;
+            color: #A0AEC0;
+            font-weight: 600;
+            padding: 16px 20px 8px 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: relative;
+            padding-left: 24px;
+        }
+
+        .nav-group-title::before {
+            content: '';
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 3px;
+            height: 10px;
+            background: linear-gradient(180deg, #5B8FF9 0%, #00C9FF 100%);
+            border-radius: 2px;
+        }
+
+        .logo-section {
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .logo-section::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 20px;
+            right: 20px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent 0%, rgba(91, 143, 249, 0.15) 50%, transparent 100%);
+        }
+
+        .bottom-nav {
+            margin-top: auto;
+            padding-top: 16px;
+            position: relative;
+        }
+
+        .bottom-nav::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 20px;
+            right: 20px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent 0%, rgba(91, 143, 249, 0.15) 50%, transparent 100%);
+        }
+
+        .sidebar-scroll {
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .sidebar-scroll::-webkit-scrollbar {
+            display: none;
+        }
+
+        body {
+            background: #f8f9fa;
+        }
+
+        /* 用户下拉菜单 */
+        .user-dropdown {
+            position: relative;
+        }
+
+        .user-menu {
+            display: none;
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            width: 320px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+            overflow: hidden;
+        }
+
+        .user-dropdown.open .user-menu {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .user-menu-header {
+            padding: 20px;
+            background: linear-gradient(135deg, #f8f9ff 0%, #f0f4ff 100%);
+            border-bottom: 1px solid #e8edf5;
+        }
+
+        .user-menu-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            color: #5A6C84;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .user-menu-item:hover {
+            background: #f8f9ff;
+            color: #5B8FF9;
+        }
+
+        .user-menu-item svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .menu-divider {
+            height: 1px;
+            background: #e8edf5;
+            margin: 8px 0;
+        }
+
+        /* 聊天消息样式 */
+        .message {
+            margin-bottom: 24px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message-user {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .message-user .message-content {
+            background: linear-gradient(135deg, rgba(91, 143, 249, 0.1) 0%, rgba(0, 201, 255, 0.08) 100%);
+            color: #1f2937;
+            border-radius: 16px 16px 4px 16px;
+            padding: 12px 16px;
+            max-width: 70%;
+        }
+
+        .message-assistant {
+            display: flex;
+            gap: 12px;
+        }
+
+        .message-assistant .avatar {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #5B8FF9 0%, #00C9FF 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .message-assistant .message-content {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 16px 16px 16px 4px;
+            padding: 16px;
+            max-width: 80%;
+        }
+
+        .message-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .message-actions button {
+            padding: 6px 12px;
+            border: 1px solid #e5e7eb;
+            background: white;
+            border-radius: 6px;
+            font-size: 13px;
+            color: #6b7280;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .message-actions button:hover {
+            border-color: #5B8FF9;
+            color: #5B8FF9;
+        }
+
+        /* 滑块样式 */
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 6px;
+            background: #e5e7eb;
+            border-radius: 3px;
+            outline: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            background: linear-gradient(135deg, #5B8FF9 0%, #00C9FF 100%);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(91, 143, 249, 0.3);
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            background: linear-gradient(135deg, #5B8FF9 0%, #00C9FF 100%);
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 6px rgba(91, 143, 249, 0.3);
+        }
+
+        /* 输入框样式 */
+        .chat-input-container {
+            border-top: 1px solid #e5e7eb;
+            background: white;
+            padding: 16px 24px;
+        }
+
+        .chat-input {
+            display: flex;
+            gap: 12px;
+            align-items: flex-end;
+        }
+
+        .chat-input textarea {
+            flex: 1;
+            border: 1.5px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 12px 16px;
+            resize: none;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .chat-input textarea:focus {
+            border-color: #5B8FF9;
+            box-shadow: 0 0 0 3px rgba(91, 143, 249, 0.1);
+        }
+
+        /* 欢迎界面 */
+        .welcome-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: #6b7280;
+        }
+
+        .welcome-screen h2 {
+            font-size: 24px;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 16px;
+        }
+
+        .suggestion-chips {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 32px;
+            max-width: 600px;
+        }
+
+        .suggestion-chip {
+            padding: 12px 16px;
+            background: white;
+            border: 1.5px solid #e5e7eb;
+            border-radius: 12px;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+            color: #4b5563;
+        }
+
+        .suggestion-chip:hover {
+            border-color: #5B8FF9;
+            background: rgba(91, 143, 249, 0.05);
+            color: #5B8FF9;
+        }
+    </style>
+</head>
+<body class="h-screen overflow-hidden flex">
+
+    <!-- 侧边栏 -->
+    <aside class="w-64 gradient-bg-sidebar flex flex-col h-screen shadow-xl">
+        <!-- Logo -->
+        <div class="logo-section">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 gradient-bg-blue rounded-lg flex items-center justify-center shadow-lg">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-lg font-bold text-gray-800">联核通元</h1>
+                    <p class="text-xs text-gray-500">LINAHE ONE</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 菜单 -->
+        <nav class="flex-1 overflow-y-auto sidebar-scroll px-3 py-4">
+            <div class="nav-group-title">模型中心</div>
+            <a href="model-marketplace.html" class="nav-item">
+                <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                </svg>
+                <span>模型广场</span>
+            </a>
+            <a href="model-finetuning-complete.html" class="nav-item">
+                <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/>
+                </svg>
+                <span>模型微调</span>
+            </a>
+
+            <div class="nav-group-title">体验中心</div>
+            <a href="text-chat.html" class="nav-item active">
+                <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
+                </svg>
+                <span>文本对话</span>
+            </a>
+            <a href="image-generation.html" class="nav-item">
+                <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                </svg>
+                <span>图像生成</span>
+            </a>
+            <a href="video-generation.html" class="nav-item">
+                <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                </svg>
+                <span>视频生成</span>
+            </a>
+            <a href="voice-synthesis.html" class="nav-item">
+                <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/>
+                </svg>
+                <span>语音合成</span>
+            </a>
+            
+
+            <div class="nav-group-title">智能中心</div>
+            <a href="ai-agents.html" class="nav-item">
+                <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+                </svg>
+                <span>智能体</span>
+            </a>
+            <a href="knowledge-base.html" class="nav-item">
+                <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                </svg>
+                <span>知识库</span>
+            </a>
+            <a href="template-center.html" class="nav-item">
+                <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 16a1 1 0 011-1h4a1 1 0 011 1v3a1 1 0 01-1 1H5a1 1 0 01-1-1v-3zM14 16a1 1 0 011-1h4a1 1 0 011 1v3a1 1 0 01-1 1h-4a1 1 0 01-1-1v-3z"/>
+                </svg>
+                <span>模板中心</span>
+            </a>
+        </nav>
+
+        <!-- 底部固定菜单 -->
+        <div class="bottom-nav px-3 pb-4">
+            <a href="#" class="nav-item">
+                <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                </svg>
+                <span>文档中心</span>
+            </a>
+
+            <a href="#" class="nav-item">
+                <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/>
+                </svg>
+                <span>工单反馈</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- 主内容区域 -->
+    <main class="flex-1 flex flex-col h-screen overflow-hidden bg-white">
+        <!-- 顶部导航栏 -->
+        <header class="bg-white px-8 py-4 flex items-center justify-between border-b border-gray-200">
+            <div class="flex items-center gap-4">
+                <h2 class="text-xl font-semibold text-gray-800">文本对话</h2>
+                <div class="flex items-center gap-2 px-3 py-1.5 bg-blue-50 rounded-lg">
+                    <svg class="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                    </svg>
+                    <span class="text-xs font-medium text-blue-700">周年回馈: 企业/学生认证后, 即可领取专属福利!</span>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <!-- 用户下拉菜单 -->
+                <div class="user-dropdown">
+                    <div class="user-avatar w-10 h-10 gradient-bg-blue rounded-full flex items-center justify-center text-white font-semibold cursor-pointer" onclick="toggleUserMenu()">
+                        <span>用</span>
+                    </div>
+
+                    <div class="user-menu">
+                        <!-- 用户信息头部 -->
+                        <div class="user-menu-header">
+                            <div class="flex items-start gap-3">
+                                <div class="w-12 h-12 gradient-bg-blue rounded-full flex items-center justify-center text-white font-semibold text-lg flex-shrink-0">
+                                    <span>用</span>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <h4 class="font-semibold text-gray-800 text-base">用户昵称</h4>
+                                    <p class="text-sm text-gray-500 mt-1">153****9022</p>
+                                    <div class="mt-2 flex items-center gap-2">
+                                        <svg class="w-4 h-4 text-green-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                        </svg>
+                                        <p class="text-sm text-gray-500">上海电视台新媒体中心</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 菜单项 -->
+                        <div class="py-2">
+                            <a href="user-profile.html" class="user-menu-item">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                                </svg>
+                                <span class="flex-1">个人信息</span>
+                                <svg class="w-4 h-4 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                </svg>
+                            </a>
+
+                            <a href="enterprise-settings.html" class="user-menu-item">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                                </svg>
+                                <span class="flex-1">企业账号设置</span>
+                                <svg class="w-4 h-4 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                </svg>
+                            </a>
+
+                            <a href="api-keys.html" class="user-menu-item">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
+                                </svg>
+                                <span class="flex-1">API 密钥</span>
+                                <svg class="w-4 h-4 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                </svg>
+                            </a>
+
+                            <a href="billing-center.html" class="user-menu-item">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2z"/>
+                                </svg>
+                                <span class="flex-1">费用中心</span>
+                                <svg class="w-4 h-4 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                </svg>
+                            </a>
+                        </div>
+
+                        <div class="menu-divider"></div>
+
+                        <!-- 退出登录 -->
+                        <div class="py-2">
+                            <a href="#" class="user-menu-item text-red-500 hover:bg-red-50">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                                </svg>
+                                <span class="flex-1">退出登录</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- 主体内容 - 左右分栏 -->
+        <div class="flex-1 flex overflow-hidden">
+            <!-- 左侧参数面板 -->
+            <div class="w-80 border-r border-gray-200 overflow-y-auto p-6 bg-gray-50">
+                <div class="space-y-6">
+                    <!-- Model -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-900 mb-3">Model</label>
+                        <select class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-sm">
+                            <option>DeepSeek-V3.1-Terminus</option>
+                            <option>Hunyuan-4B</option>
+                            <option>GPT-4</option>
+                            <option>Claude-3-Opus</option>
+                        </select>
+                    </div>
+
+                    <!-- Max Tokens -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-900 mb-3">Max Tokens</label>
+                        <input type="number" value="8192" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                    </div>
+
+                    <!-- Temperature -->
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <label class="text-sm font-semibold text-gray-900 flex items-center gap-2">
+                                Temperature
+                                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                            </label>
+                            <input type="number" value="0.7" step="0.1" min="0" max="2" class="w-20 px-3 py-1.5 border border-gray-300 rounded-lg text-sm text-center">
+                        </div>
+                        <input type="range" min="0" max="2" step="0.1" value="0.7" class="w-full" oninput="this.previousElementSibling.querySelector('input[type=number]').value = this.value">
+                    </div>
+
+                    <!-- Top-P -->
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <label class="text-sm font-semibold text-gray-900 flex items-center gap-2">
+                                Top-P
+                                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                            </label>
+                            <input type="number" value="0.7" step="0.1" min="0" max="1" class="w-20 px-3 py-1.5 border border-gray-300 rounded-lg text-sm text-center">
+                        </div>
+                        <input type="range" min="0" max="1" step="0.1" value="0.7" class="w-full" oninput="this.previousElementSibling.querySelector('input[type=number]').value = this.value">
+                    </div>
+
+                    <!-- Top-K -->
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <label class="text-sm font-semibold text-gray-900 flex items-center gap-2">
+                                Top-K
+                                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                            </label>
+                            <input type="number" value="50" min="0" max="100" class="w-20 px-3 py-1.5 border border-gray-300 rounded-lg text-sm text-center">
+                        </div>
+                        <input type="range" min="0" max="100" step="1" value="50" class="w-full" oninput="this.previousElementSibling.querySelector('input[type=number]').value = this.value">
+                    </div>
+
+                    <!-- Frequency Penalty -->
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <label class="text-sm font-semibold text-gray-900 flex items-center gap-2">
+                                Frequency Penalty
+                                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                            </label>
+                            <input type="number" value="0.0" step="0.1" min="0" max="2" class="w-20 px-3 py-1.5 border border-gray-300 rounded-lg text-sm text-center">
+                        </div>
+                        <input type="range" min="0" max="2" step="0.1" value="0" class="w-full" oninput="this.previousElementSibling.querySelector('input[type=number]').value = this.value">
+                    </div>
+
+                    <!-- Enable Thinking -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-900 mb-3">Enable Thinking</label>
+                        <select class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-sm">
+                            <option>关闭</option>
+                            <option>开启</option>
+                        </select>
+                    </div>
+
+                    <!-- Thinking Budget -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-900 mb-3">Thinking Budget</label>
+                        <input type="number" value="4096" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右侧聊天区域 -->
+            <div class="flex-1 flex flex-col">
+                <!-- 聊天消息区域 -->
+                <div class="flex-1 overflow-y-auto p-6" id="chatMessages">
+                    <!-- 欢迎界面 -->
+                    <div class="welcome-screen" id="welcomeScreen">
+                        <svg class="w-16 h-16 text-blue-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
+                        </svg>
+                        <h2>你好，你是什么模型，？</h2>
+                        <p class="text-sm">开始对话，探索AI的无限可能</p>
+
+                        <div class="suggestion-chips">
+                            <button class="suggestion-chip" onclick="sendSuggestion('鲨鱼为什么也会被淹死')">
+                                鲨鱼为什么也会被淹死
+                            </button>
+                            <button class="suggestion-chip" onclick="sendSuggestion('有没见数学类题')">
+                                有没见数学类题
+                            </button>
+                            <button class="suggestion-chip" onclick="sendSuggestion('抗生素能治疗病毒感染吗?')">
+                                抗生素能治疗病毒感染吗?
+                            </button>
+                            <button class="suggestion-chip" onclick="sendSuggestion('给我讲个最简单的魔术')">
+                                给我讲个最简单的魔术
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 输入框 -->
+                <div class="chat-input-container">
+                    <div class="chat-input">
+                        <textarea
+                            id="messageInput"
+                            rows="3"
+                            placeholder="请输入提示词..."
+                            onkeydown="if(event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); sendMessage(); }"
+                        ></textarea>
+                        <button class="px-6 py-3 gradient-bg-blue text-white rounded-lg hover:shadow-lg transition-all" onclick="sendMessage()">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-3 text-center">
+                        内容由人工智能生成，可能不完全准确。仅供参考。请遵守平台的
+                        <a href="#" class="text-blue-600 hover:underline">服务条款</a>
+                        及适用的法律法规
+                    </p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        let messageCount = 0;
+
+        function sendSuggestion(text) {
+            document.getElementById('messageInput').value = text;
+            sendMessage();
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+
+            if (!message) return;
+
+            // 隐藏欢迎界面
+            const welcomeScreen = document.getElementById('welcomeScreen');
+            if (welcomeScreen) {
+                welcomeScreen.style.display = 'none';
+            }
+
+            const chatMessages = document.getElementById('chatMessages');
+
+            // 用户消息
+            const userMessage = document.createElement('div');
+            userMessage.className = 'message message-user';
+            userMessage.innerHTML = `
+                <div class="message-content">
+                    ${message}
+                </div>
+            `;
+            chatMessages.appendChild(userMessage);
+
+            // 清空输入框
+            input.value = '';
+
+            // 模拟AI回复
+            setTimeout(() => {
+                const assistantMessage = document.createElement('div');
+                assistantMessage.className = 'message message-assistant';
+
+                let response = '';
+                if (message.includes('鲨鱼')) {
+                    response = `这是一个非常好的问题！它打破了一个常见的误解：我们通常认为鲨鱼在水里就像鱼在水中一样自在，所以\"鱼会被淹死\"听起来很荒谬。
+
+但事实上，<strong>鲨鱼确实可能因为某种原因\"淹死\"</strong>。
+
+要理解这一点，我们首先要明白鲨鱼和其他大多数鱼类的呼吸方式有何不同。
+
+<h3 class="text-lg font-semibold mt-4 mb-2">关键区别：主动呼吸 vs. 被动呼吸</h3>
+
+<strong>1. 大多数硬骨鱼（比如金鱼、鲈鱼）：</strong>
+
+它们有鳃盖，可以像一扇门一样开合。这意味着它们可以主动把水吸进来，即使站着不动，也能从流过鳃的水中提取氧气。在这个过程中，水会流过鳃丝，进行氧气交换。
+
+<strong>2. 大多数鲨鱼（特别是大型鲨鱼，如大白鲨、虎鲨等）：</strong>
+
+它们没有鳃盖，而是有5-7个裸露的鳃裂。因此，它们必须不停地游动，让水强制流过鳃裂来获取氧气。这种呼吸方式叫做"冲压式呼吸"（ram ventilation）。
+
+而且我还发现这样几顶类大鲨鱼问题，现在在您的几乎所有顶尖大家都分享问题，帮要是遇到某几顶类用程序场，但当新闻间问题最基础您在问问、分享生活中的趣事。
+
+我还能帮您作内容，像写敢事、写文章之类的，或以技科学习习简时讨时谈。`;
+                } else {
+                    response = `你好！我是DeepSeek，由深度求索公司创建的AI助手。我是DeepSeek最新版本的模型，知识截止日到2024年7月。
+
+我可以帮你解答各种问题，进行对话交流，处理文本任务，还支持文件上传功能（包括图像、txt、pdf、ppt、word、excel等格式），能从中读取文字信息进行处理。虽然我不具备多模态识别功能，但可以帮你分析上传文件中的文字内容。
+
+我目前是完全免费的，支持128K的上下文长度，还可以通过联网搜索获取最新信息（需要你手动开启搜索功能）。
+
+有什么我可以帮助你的呢？教思乐意为你提供帮助！😊`;
+                }
+
+                assistantMessage.innerHTML = `
+                    <div class="avatar">
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="message-content">
+                            ${response}
+                            <div class="text-xs text-gray-500 mt-2">
+                                <em>tokens: ${Math.floor(Math.random() * 100) + 100}, speed: ${(Math.random() * 10 + 20).toFixed(2)} tokens/s</em>
+                            </div>
+                        </div>
+                        <div class="message-actions">
+                            <button onclick="copyMessage(this)">
+                                <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                                </svg>
+                                复制
+                            </button>
+                            <button>
+                                <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                                </svg>
+                                点赞
+                            </button>
+                            <button>
+                                <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/>
+                                </svg>
+                                重新生成
+                            </button>
+                        </div>
+                    </div>
+                `;
+                chatMessages.appendChild(assistantMessage);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }, 1000);
+
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function copyMessage(button) {
+            const messageContent = button.closest('.message-assistant').querySelector('.message-content').innerText;
+            navigator.clipboard.writeText(messageContent);
+            button.textContent = '已复制';
+            setTimeout(() => {
+                button.innerHTML = `<svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                </svg>复制`;
+            }, 2000);
+        }
+
+        function toggleUserMenu() {
+            const dropdown = document.querySelector('.user-dropdown');
+            dropdown.classList.toggle('open');
+        }
+
+        document.addEventListener('click', function(e) {
+            const dropdown = document.querySelector('.user-dropdown');
+            const userAvatar = document.querySelector('.user-avatar');
+
+            if (dropdown && !dropdown.contains(e.target) && !userAvatar.contains(e.target)) {
+                dropdown.classList.remove('open');
+            }
+        });
+
+        console.log('文本对话界面加载完成 ✓');
+        console.log('功能: 模型参数配置、实时对话、消息操作');
+    </script>
+</body>
+</html>

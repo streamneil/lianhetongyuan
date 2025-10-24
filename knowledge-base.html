@@ -1,0 +1,1300 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>知识库 - 联核通元</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        * {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+
+        .gradient-bg-blue {
+            background: linear-gradient(135deg, #5B8FF9 0%, #00C9FF 50%, #0081FF 100%);
+            box-shadow: 0 8px 24px rgba(91, 143, 249, 0.25);
+        }
+
+        .gradient-bg-sidebar {
+            background: linear-gradient(145deg, #FAFBFF 0%, #F5F7FF 50%, #EEF2FF 100%);
+            position: relative;
+        }
+
+        .gradient-bg-sidebar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 200px;
+            background: radial-gradient(ellipse at top left, rgba(91, 143, 249, 0.08) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .nav-item {
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            margin: 3px 8px;
+            border-radius: 10px;
+            cursor: pointer;
+            color: #5A6C84;
+            font-size: 14px;
+            font-weight: 500;
+            text-decoration: none;
+        }
+
+        .nav-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 0;
+            height: 0;
+            background: linear-gradient(180deg, #5B8FF9 0%, #00C9FF 100%);
+            border-radius: 0 4px 4px 0;
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .nav-item:hover {
+            background: linear-gradient(135deg, rgba(91, 143, 249, 0.08) 0%, rgba(0, 201, 255, 0.05) 100%);
+            color: #5B8FF9;
+            transform: translateX(2px);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(135deg, rgba(91, 143, 249, 0.15) 0%, rgba(0, 201, 255, 0.12) 100%);
+            color: #5B8FF9;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(91, 143, 249, 0.12);
+        }
+
+        .nav-item.active::before {
+            width: 4px;
+            height: 70%;
+        }
+
+        .nav-icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-group-title {
+            font-size: 12px;
+            color: #A0AEC0;
+            font-weight: 600;
+            padding: 16px 20px 8px 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: relative;
+            padding-left: 24px;
+        }
+
+        .nav-group-title::before {
+            content: '';
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 3px;
+            height: 10px;
+            background: linear-gradient(180deg, #5B8FF9 0%, #00C9FF 100%);
+            border-radius: 2px;
+        }
+
+        .nav-submenu {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .nav-item.has-submenu.open .nav-submenu {
+            max-height: 200px;
+        }
+
+        .nav-submenu .nav-item {
+            padding-left: 48px;
+            font-size: 13px;
+        }
+
+        .expand-icon {
+            margin-left: auto;
+            transition: transform 0.3s ease;
+        }
+
+        .nav-item.has-submenu.open .expand-icon {
+            transform: rotate(90deg);
+        }
+
+        .logo-section {
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .logo-section::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 20px;
+            right: 20px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent 0%, rgba(91, 143, 249, 0.15) 50%, transparent 100%);
+        }
+
+        .bottom-nav {
+            margin-top: auto;
+            padding-top: 16px;
+            position: relative;
+        }
+
+        .bottom-nav::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 20px;
+            right: 20px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent 0%, rgba(91, 143, 249, 0.15) 50%, transparent 100%);
+        }
+
+        .sidebar-scroll {
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .sidebar-scroll::-webkit-scrollbar {
+            display: none;
+        }
+
+        body {
+            background: #F8F9FA;
+        }
+
+        /* 左侧知识库导航 */
+        .knowledge-sidebar {
+            width: 260px;
+            background: white;
+            border-right: 1px solid #E5E7EB;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .kb-nav-item {
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #4B5563;
+            text-decoration: none;
+        }
+
+        .kb-nav-item:hover {
+            background: #F3F4F6;
+        }
+
+        .kb-nav-item.active {
+            background: #EFF6FF;
+            color: #2563EB;
+            font-weight: 500;
+        }
+
+        .kb-nav-item svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .create-kb-btn {
+            margin: 16px;
+            padding: 12px;
+            background: linear-gradient(135deg, #5B8FF9 0%, #00C9FF 100%);
+            color: white;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .create-kb-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(91, 143, 249, 0.4);
+        }
+
+        /* 用户下拉菜单 */
+        .user-dropdown {
+            position: relative;
+        }
+
+        .user-menu {
+            display: none;
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            width: 320px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+            overflow: hidden;
+        }
+
+        .user-dropdown.open .user-menu {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .user-menu-header {
+            padding: 20px;
+            background: linear-gradient(135deg, #f8f9ff 0%, #f0f4ff 100%);
+            border-bottom: 1px solid #e8edf5;
+        }
+
+        .user-menu-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            color: #5A6C84;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .user-menu-item:hover {
+            background: #f8f9ff;
+            color: #5B8FF9;
+        }
+
+        .user-menu-item svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .menu-divider {
+            height: 1px;
+            background: #e8edf5;
+            margin: 8px 0;
+        }
+
+        /* 上传区域 */
+        .upload-area {
+            border: 2px dashed #D1D5DB;
+            border-radius: 12px;
+            padding: 60px 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .upload-area:hover {
+            border-color: #5B8FF9;
+            background: #F8FAFF;
+        }
+
+        .upload-icon {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 20px;
+            background: linear-gradient(135deg, #5B8FF9 0%, #00C9FF 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .upload-methods {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            max-width: 500px;
+            margin: 24px auto 0;
+        }
+
+        .upload-method-btn {
+            padding: 12px 20px;
+            border: 2px solid #E5E7EB;
+            border-radius: 10px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 14px;
+            color: #4B5563;
+        }
+
+        .upload-method-btn:hover {
+            border-color: #5B8FF9;
+            color: #5B8FF9;
+        }
+
+        /* 知识库卡片 */
+        .kb-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .kb-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+        }
+
+        .kb-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .kb-stats {
+            display: flex;
+            gap: 16px;
+            font-size: 13px;
+            color: #6B7280;
+        }
+
+        /* 文件列表 */
+        .file-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px;
+            background: white;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .file-item:hover {
+            background: #F8FAFF;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .file-icon {
+            width: 48px;
+            height: 48px;
+            background: #FEE2E2;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #DC2626;
+            flex-shrink: 0;
+        }
+
+        .file-tags {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .file-tag {
+            padding: 4px 12px;
+            background: #F3F4F6;
+            border-radius: 6px;
+            font-size: 12px;
+            color: #6B7280;
+        }
+
+        /* 右侧聊天区域 */
+        .chat-container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .kb-logo {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #1F2937 0%, #111827 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+        }
+
+        .suggestion-chip {
+            padding: 10px 20px;
+            background: #F3F4F6;
+            border-radius: 20px;
+            font-size: 14px;
+            color: #4B5563;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .suggestion-chip:hover {
+            background: #E5E7EB;
+        }
+
+        .chat-input-area {
+            padding: 20px;
+            border-top: 1px solid #E5E7EB;
+        }
+
+        .chat-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #E5E7EB;
+            border-radius: 10px;
+            resize: none;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .chat-input:focus {
+            border-color: #5B8FF9;
+        }
+
+        /* 知识库子菜单 */
+        .kb-nav-group {
+            margin-bottom: 4px;
+        }
+
+        .kb-submenu {
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .kb-sub-item {
+            padding-left: 48px !important;
+            font-size: 13px;
+        }
+
+        .kb-expand-icon {
+            transition: transform 0.3s ease;
+        }
+
+        .kb-nav-group.open .kb-expand-icon {
+            transform: rotate(180deg);
+        }
+
+        /* 创建知识库模态框 */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 480px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            padding: 24px 24px 16px;
+            border-bottom: 1px solid #E5E7EB;
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        .kb-type-option {
+            padding: 16px;
+            border: 2px solid #E5E7EB;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .kb-type-option:hover {
+            border-color: #5B8FF9;
+            background: #F8FAFF;
+        }
+
+        .kb-type-option.selected {
+            border-color: #5B8FF9;
+            background: linear-gradient(135deg, rgba(91, 143, 249, 0.08) 0%, rgba(0, 201, 255, 0.05) 100%);
+        }
+
+        .kb-type-radio {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 2px solid #D1D5DB;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .kb-type-option.selected .kb-type-radio {
+            border-color: #5B8FF9;
+        }
+
+        .kb-type-radio::after {
+            content: '';
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #5B8FF9;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .kb-type-option.selected .kb-type-radio::after {
+            opacity: 1;
+        }
+
+        .modal-footer {
+            padding: 16px 24px;
+            border-top: 1px solid #E5E7EB;
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+
+        .modal-btn {
+            padding: 10px 24px;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .modal-btn-cancel {
+            background: #F3F4F6;
+            color: #6B7280;
+        }
+
+        .modal-btn-cancel:hover {
+            background: #E5E7EB;
+        }
+
+        .modal-btn-confirm {
+            background: linear-gradient(135deg, #5B8FF9 0%, #00C9FF 100%);
+            color: white;
+        }
+
+        .modal-btn-confirm:hover {
+            box-shadow: 0 4px 12px rgba(91, 143, 249, 0.4);
+        }
+    </style>
+</head>
+<body class="h-screen overflow-hidden flex">
+
+    <!-- 主侧边栏 -->
+    <aside class="w-64 gradient-bg-sidebar flex flex-col h-screen shadow-xl">
+        <div class="logo-section">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 gradient-bg-blue rounded-lg flex items-center justify-center shadow-lg">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-lg font-bold text-gray-800">联核通元</h1>
+                    <p class="text-xs text-gray-500">LINAHE ONE</p>
+                </div>
+            </div>
+        </div>
+
+        <nav class="flex-1 overflow-y-auto sidebar-scroll px-3 py-4">
+            <div class="nav-group-title">模型中心</div>
+            <a href="model-marketplace.html" class="nav-item">
+                <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                </svg>
+                <span>模型广场</span>
+            </a>
+            <a href="model-finetuning-complete.html" class="nav-item">
+                <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/>
+                </svg>
+                <span>模型微调</span>
+            </a>
+
+            <div class="nav-group-title">体验中心</div>
+            <a href="text-chat.html" class="nav-item">
+                <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
+                </svg>
+                <span>文本对话</span>
+            </a>
+            <a href="image-generation.html" class="nav-item">
+                <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                </svg>
+                <span>图像生成</span>
+            </a>
+            <a href="video-generation.html" class="nav-item">
+                <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                </svg>
+                <span>视频生成</span>
+            </a>
+            <a href="voice-synthesis.html" class="nav-item">
+                <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/>
+                </svg>
+                <span>语音合成</span>
+            </a>
+            
+
+            <div class="nav-group-title">智能中心</div>
+
+            <a href="ai-agents.html" class="nav-item">
+                <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+                </svg>
+                <span>智能体</span>
+            </a>
+
+            <a href="knowledge-base.html" class="nav-item active">
+                <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                </svg>
+                <span>知识库</span>
+            </a>
+
+            <a href="template-center.html" class="nav-item">
+                <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 16a1 1 0 011-1h4a1 1 0 011 1v3a1 1 0 01-1 1H5a1 1 0 01-1-1v-3zM14 16a1 1 0 011-1h4a1 1 0 011 1v3a1 1 0 01-1 1h-4a1 1 0 01-1-1v-3z"/>
+                </svg>
+                <span>模板中心</span>
+            </a>
+        </nav>
+
+        <div class="bottom-nav px-3 pb-4">
+            <a href="#" class="nav-item">
+                <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                </svg>
+                <span>文档中心</span>
+            </a>
+            <a href="#" class="nav-item">
+                <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/>
+                </svg>
+                <span>工单反馈</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- 主内容区域 -->
+    <main class="flex-1 flex flex-col h-screen overflow-hidden">
+        <!-- 顶部导航栏 -->
+        <header class="bg-white px-8 py-4 flex items-center justify-between shadow-sm">
+            <div class="flex items-center gap-4">
+                <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                </svg>
+                <h2 class="text-xl font-semibold text-gray-800">知识库</h2>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <div class="flex items-center gap-3 bg-blue-50 px-4 py-2 rounded-lg">
+                    <div class="w-2 h-2 bg-green-400 rounded-full"></div>
+                    <span class="text-sm font-medium text-gray-700">周年回馈: 企业/学生认证, 即可领取专属福利!</span>
+                </div>
+
+                <div class="user-dropdown">
+                    <div class="user-avatar w-10 h-10 gradient-bg-blue rounded-full flex items-center justify-center text-white font-semibold cursor-pointer" onclick="toggleUserMenu()">
+                        <span>用</span>
+                    </div>
+
+                    <div class="user-menu">
+                        <div class="user-menu-header">
+                            <div class="flex items-start gap-3">
+                                <div class="w-12 h-12 gradient-bg-blue rounded-full flex items-center justify-center text-white font-semibold text-lg flex-shrink-0">
+                                    <span>用</span>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <h4 class="font-semibold text-gray-800 text-base">用户昵称</h4>
+                                    <p class="text-sm text-gray-500 mt-1">153****9022</p>
+                                    <div class="mt-2 flex items-center gap-2">
+                                        <svg class="w-4 h-4 text-green-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                        </svg>
+                                        <p class="text-sm text-gray-500">上海电视台新媒体中心</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 菜单项 -->
+                        <div class="py-2">
+                            <a href="user-profile.html" class="user-menu-item">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                                </svg>
+                                <span class="flex-1">个人信息</span>
+                                <svg class="w-4 h-4 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                </svg>
+                            </a>
+
+                            <a href="enterprise-settings.html" class="user-menu-item">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                                </svg>
+                                <span class="flex-1">企业账号设置</span>
+                                <svg class="w-4 h-4 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                </svg>
+                            </a>
+
+                            <a href="api-keys.html" class="user-menu-item">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1721 9z"/>
+                                </svg>
+                                <span class="flex-1">API 密钥</span>
+                                <svg class="w-4 h-4 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                </svg>
+                            </a>
+
+                            <a href="billing-center.html" class="user-menu-item">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2z"/>
+                                </svg>
+                                <span class="flex-1">费用中心</span>
+                                <svg class="w-4 h-4 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                </svg>
+                            </a>
+                        </div>
+
+                        <div class="menu-divider"></div>
+
+                        <div class="py-2">
+                            <a href="#" class="user-menu-item text-red-500 hover:bg-red-50">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                                </svg>
+                                <span class="flex-1">退出登录</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- 内容区域 -->
+        <div class="flex-1 flex overflow-hidden">
+            <!-- 左侧知识库导航 -->
+            <div class="knowledge-sidebar">
+                <button class="create-kb-btn" onclick="createKnowledgeBase()">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                    </svg>
+                    创建知识库
+                </button>
+
+                <div class="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                    个人知识库
+                </div>
+
+                <div class="kb-nav-group">
+                    <a href="#" class="kb-nav-item" onclick="toggleKBSubmenu(event)">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                        </svg>
+                        <span class="flex-1">个人知识库</span>
+                        <svg class="kb-expand-icon w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </a>
+                    <div class="kb-submenu" style="max-height: 0;">
+                        <a href="#" class="kb-nav-item kb-sub-item active">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                            </svg>
+                            <span>通用标书</span>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider mt-4">
+                    企业知识库
+                </div>
+
+                <a href="#" class="kb-nav-item">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                    </svg>
+                    <span>企业文档</span>
+                </a>
+            </div>
+
+            <!-- 中间内容区域 -->
+            <div class="flex-1 p-6 overflow-y-auto" id="mainContent" style="max-width: 900px;">
+                <!-- 将通过 JavaScript 动态切换内容 -->
+            </div>
+
+            <!-- 右侧聊天区域 -->
+            <div class="p-6" style="width: 480px; flex-shrink: 0;">
+                <div class="chat-container">
+                    <div class="flex-1 flex flex-col items-center justify-center p-8 text-center">
+                        <div class="kb-logo">
+                            <svg class="w-16 h-16 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+                            </svg>
+                        </div>
+
+                        <h3 class="text-2xl font-bold text-gray-800 mb-2">知识库</h3>
+                        <p class="text-sm text-gray-600 mb-2">创建人：纳米AI</p>
+                        <p class="text-sm text-gray-500 mb-8">你可以通过提问了解知识库中的相关内容</p>
+
+                        <div class="grid grid-cols-2 gap-3 w-full mb-8">
+                            <div class="suggestion-chip">如何概括备考营养师的核心策略?</div>
+                            <div class="suggestion-chip">如何构建分阶段学习框架?</div>
+                            <div class="suggestion-chip">备考方法可扩展其他健康考试吗?</div>
+                            <div class="suggestion-chip">冲刺资料如何高效利用?</div>
+                        </div>
+                    </div>
+
+                    <div class="chat-input-area">
+                        <textarea
+                            class="chat-input"
+                            rows="3"
+                            placeholder="基于知识库提问"
+                        ></textarea>
+                        <div class="flex items-center justify-between mt-3">
+                            <div class="flex items-center gap-2 text-sm text-gray-500">
+                                <select class="px-3 py-1 border border-gray-300 rounded-lg text-sm">
+                                    <option>默认模型</option>
+                                </select>
+                                <span>R1</span>
+                                <svg class="w-5 h-5 cursor-pointer" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/>
+                                </svg>
+                            </div>
+                            <button class="p-2">
+                                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 创建知识库模态框 -->
+    <div class="modal-overlay" id="createKBModal" onclick="closeModalOnOverlay(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h3 class="text-lg font-semibold text-gray-800">选择知识库类型</h3>
+            </div>
+            <div class="modal-body">
+                <div class="kb-type-option selected" onclick="selectKBType(this, 'personal')">
+                    <div class="kb-type-radio"></div>
+                    <div class="flex-1">
+                        <h4 class="font-semibold text-gray-800 mb-1">个人知识库</h4>
+                        <p class="text-sm text-gray-600">仅个人可见，用于存储个人学习资料和文档</p>
+                    </div>
+                </div>
+                <div class="kb-type-option" onclick="selectKBType(this, 'enterprise')">
+                    <div class="kb-type-radio"></div>
+                    <div class="flex-1">
+                        <h4 class="font-semibold text-gray-800 mb-1">企业知识库</h4>
+                        <p class="text-sm text-gray-600">团队共享，需要企业认证后才能创建</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn modal-btn-cancel" onclick="closeCreateKBModal()">取消</button>
+                <button class="modal-btn modal-btn-confirm" onclick="confirmCreateKB()">确定</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentView = 'upload';
+        let selectedKBType = 'personal';
+
+        // 用户菜单切换
+        function toggleUserMenu() {
+            const dropdown = document.querySelector('.user-dropdown');
+            dropdown.classList.toggle('open');
+        }
+
+        // 点击外部关闭用户菜单
+        document.addEventListener('click', function(e) {
+            const dropdown = document.querySelector('.user-dropdown');
+            const userAvatar = document.querySelector('.user-avatar');
+            if (dropdown && !dropdown.contains(e.target) && userAvatar && !userAvatar.contains(e.target)) {
+                dropdown.classList.remove('open');
+            }
+        });
+
+        // 切换知识库子菜单
+        function toggleKBSubmenu(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            const navGroup = event.currentTarget.parentElement;
+            const submenu = navGroup.querySelector('.kb-submenu');
+
+            navGroup.classList.toggle('open');
+            if (navGroup.classList.contains('open')) {
+                submenu.style.maxHeight = submenu.scrollHeight + 'px';
+            } else {
+                submenu.style.maxHeight = '0';
+            }
+        }
+
+        // 创建知识库
+        function createKnowledgeBase() {
+            document.getElementById('createKBModal').classList.add('show');
+        }
+
+        // 关闭创建知识库模态框
+        function closeCreateKBModal() {
+            document.getElementById('createKBModal').classList.remove('show');
+        }
+
+        // 点击遮罩关闭模态框
+        function closeModalOnOverlay(event) {
+            if (event.target === event.currentTarget) {
+                closeCreateKBModal();
+            }
+        }
+
+        // 选择知识库类型
+        function selectKBType(element, type) {
+            document.querySelectorAll('.kb-type-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            element.classList.add('selected');
+            selectedKBType = type;
+        }
+
+        // 确认创建知识库
+        function confirmCreateKB() {
+            if (selectedKBType === 'enterprise') {
+                // 检查是否已完成企业认证
+                alert('创建企业知识库需要先完成企业认证');
+                closeCreateKBModal();
+                return;
+            }
+
+            // 这里可以添加实际的创建逻辑
+            alert('创建' + (selectedKBType === 'personal' ? '个人' : '企业') + '知识库成功！');
+            closeCreateKBModal();
+        }
+
+        // 显示上传界面
+        function showUploadView() {
+            const mainContent = document.getElementById('mainContent');
+            mainContent.innerHTML = `
+                <div class="max-w-3xl mx-auto">
+                    <div class="mb-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-semibold text-gray-800">
+                                <svg class="w-6 h-6 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                                </svg>
+                                通用标书
+                            </h3>
+                            <button class="px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm hover:bg-gray-50">
+                                发布到知识广场
+                            </button>
+                        </div>
+                        <p class="text-sm text-gray-600">点击添加知识库简介</p>
+                    </div>
+
+                    <div class="mb-6">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center gap-2">
+                                <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>
+                                </svg>
+                                <span class="text-sm font-medium text-gray-700">分享</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                                </svg>
+                                <span class="text-sm font-medium text-gray-700">更多</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-sm text-gray-600 mb-4">知识库还未添加任何文件</div>
+
+                    <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+                        <input type="file" id="fileInput" class="hidden" multiple onchange="handleFileSelect(event)">
+                        <div class="upload-icon">
+                            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-semibold text-gray-800 mb-2">拖入文件或从本地上传</h3>
+                        <p class="text-sm text-gray-600 mb-1">
+                            支持文档、图片、音频、视频、URL、研发语音等62种格式文件
+                        </p>
+                        <p class="text-sm text-gray-600 mb-4">
+                            如Word、Excel、PPT、PDF、TXT、EPUB、CSV、JAVA、HTML等个文件500MB以内
+                        </p>
+                        <p class="text-xs text-blue-600">
+                            上传文件后，可根据文件的信息进行深入解读和扩展应答<br>
+                            适用场景：论文、课笔记抄、会议纪要、营销方案或其他文档
+                        </p>
+
+                        <div class="upload-methods">
+                            <button class="upload-method-btn">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/>
+                                </svg>
+                                添加网址
+                            </button>
+                            <button class="upload-method-btn">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                </svg>
+                                粘贴文字
+                            </button>
+                            <button class="upload-method-btn">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                                </svg>
+                                订阅bilibili
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 显示文件列表
+        function showFileListView() {
+            const mainContent = document.getElementById('mainContent');
+            mainContent.innerHTML = `
+                <div class="max-w-4xl mx-auto">
+                    <div class="mb-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <div>
+                                <h3 class="text-lg font-semibold text-gray-800 mb-2">注册营养师</h3>
+                                <p class="text-sm text-gray-600">
+                                    <svg class="w-4 h-4 inline-block text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                    </svg>
+                    身边的营养专家创建 · 68人已加入
+                                </p>
+                                <p class="text-sm text-gray-500 mt-2">
+                                    知识库核心内容 基础营养学· 营养功能、代谢途径、膳食参考...
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between py-3 border-y border-gray-200">
+                            <div class="flex gap-4">
+                                <button class="text-sm font-medium text-gray-700 hover:text-blue-600">分享</button>
+                                <button class="text-sm font-medium text-gray-700 hover:text-blue-600">更多</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4 flex items-center justify-between">
+                        <div class="text-sm text-gray-600">96个内容 / 2.05GB</div>
+                        <div class="flex items-center gap-3">
+                            <select class="px-3 py-1.5 border border-gray-300 rounded-lg text-sm">
+                                <option>排序</option>
+                            </select>
+                            <button class="p-2 hover:bg-gray-100 rounded-lg">
+                                <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="filesList">
+                        <!-- 文件列表 -->
+                    </div>
+                </div>
+            `;
+
+            generateFileList();
+        }
+
+        // 生成文件列表
+        function generateFileList() {
+            const files = [
+                { name: '5★中国高尿酸血症与痛风诊疗指...', size: '6.63MB', tags: ['内分泌学'] },
+                { name: '5★中国糖尿病防治指南（2024版...', size: '1.25MB', tags: ['内分泌学', '风湿病学'] },
+                { name: '5★中国糖尿病病防治指南（2024版...', size: '2.45MB', tags: ['内分泌学', '糖尿病'] },
+                { name: '5★中国高血压防治指南（2024年...', size: '3.56MB', tags: ['心血管疾病', '高血压防治'] },
+                { name: '5★中国成人患者肠外肠内营养临...', size: '1.48MB', tags: ['临床营养', '营养支持'] }
+            ];
+
+            const filesList = document.getElementById('filesList');
+            filesList.innerHTML = files.map(file => `
+                <div class="file-item">
+                    <div class="file-icon">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                    <div class="flex-1">
+                        <h4 class="font-medium text-gray-800 mb-1">${file.name}</h4>
+                        <div class="flex items-center gap-3 text-sm text-gray-500 mb-2">
+                            <span>PDF文件</span>
+                            <span>${file.size}</span>
+                        </div>
+                        <div class="file-tags">
+                            ${file.tags.map(tag => `<span class="file-tag">${tag}</span>`).join('')}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 用户菜单切换
+        function toggleUserMenu() {
+            const dropdown = document.querySelector('.user-dropdown');
+            dropdown.classList.toggle('open');
+        }
+
+        // 点击外部关闭菜单
+        document.addEventListener('click', function(e) {
+            const dropdown = document.querySelector('.user-dropdown');
+            const userAvatar = document.querySelector('.user-avatar');
+
+            if (dropdown && !dropdown.contains(e.target) && !userAvatar.contains(e.target)) {
+                dropdown.classList.remove('open');
+            }
+        });
+
+        // 切换子菜单
+        function toggleSubmenu(element) {
+            element.classList.toggle('open');
+        }
+
+        // 创建知识库
+        function createKnowledgeBase() {
+            alert('创建新知识库');
+        }
+
+        // 处理文件选择
+        function handleFileSelect(event) {
+            const files = event.target.files;
+            if (files.length > 0) {
+                currentView = 'files';
+                showFileListView();
+            }
+        }
+
+        // 初始化页面
+        document.addEventListener('DOMContentLoaded', function() {
+            // 初始化个人知识库子菜单为展开状态
+            const kbNavGroup = document.querySelector('.kb-nav-group');
+            const kbSubmenu = kbNavGroup.querySelector('.kb-submenu');
+            kbNavGroup.classList.add('open');
+            kbSubmenu.style.maxHeight = kbSubmenu.scrollHeight + 'px';
+
+            // 检测当前应该显示哪个视图
+            const kbItems = document.querySelectorAll('.kb-nav-item');
+            kbItems.forEach(item => {
+                item.addEventListener('click', function(e) {
+                    // 如果是带子菜单的项，不阻止默认行为
+                    if (this.parentElement.classList.contains('kb-nav-group')) {
+                        return;
+                    }
+
+                    e.preventDefault();
+                    kbItems.forEach(i => i.classList.remove('active'));
+                    this.classList.add('active');
+
+                    const text = this.textContent.trim();
+                    if (text === '通用标书') {
+                        showUploadView();
+                    } else {
+                        showFileListView();
+                    }
+                });
+            });
+
+            // 默认显示上传视图
+            showUploadView();
+        });
+
+        console.log('知识库界面加载完成 ✓');
+    </script>
+</body>
+</html>

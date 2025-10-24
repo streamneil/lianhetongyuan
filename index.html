@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>联核通元 - 企业级大语言模型服务平台</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+        * {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+
+        body {
+            background: #FFFFFF;
+            color: #1a1a1a;
+        }
+
+        /* Navigation */
+        .nav-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+            z-index: 1000;
+        }
+
+        /* Hero Section */
+        .hero-gradient {
+            background: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(91, 143, 249, 0.15), transparent);
+        }
+
+        .hero-title {
+            font-size: 72px;
+            line-height: 1.1;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, #1a1a1a 0%, #4a4a4a 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #5B8FF9 0%, #00C9FF 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Buttons */
+        .btn-primary {
+            padding: 16px 32px;
+            border-radius: 12px;
+            background: #1a1a1a;
+            color: white;
+            font-weight: 600;
+            font-size: 16px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 2px solid #1a1a1a;
+        }
+
+        .btn-primary:hover {
+            background: #000000;
+            border-color: #000000;
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-secondary {
+            padding: 16px 32px;
+            border-radius: 12px;
+            background: white;
+            color: #1a1a1a;
+            font-weight: 600;
+            font-size: 16px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 2px solid #e5e5e5;
+        }
+
+        .btn-secondary:hover {
+            border-color: #1a1a1a;
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
+        }
+
+        /* Model Cards */
+        .model-card {
+            background: #FAFAFA;
+            border-radius: 20px;
+            padding: 40px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .model-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #5B8FF9 0%, #00C9FF 100%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .model-card:hover {
+            background: white;
+            border-color: #e5e5e5;
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+        }
+
+        .model-card:hover::before {
+            opacity: 1;
+        }
+
+        /* Feature Grid */
+        .feature-item {
+            padding: 32px;
+            border-radius: 16px;
+            background: #FAFAFA;
+            transition: all 0.3s ease;
+        }
+
+        .feature-item:hover {
+            background: white;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+        }
+
+        /* Stats */
+        .stat-item {
+            text-align: center;
+            padding: 24px;
+        }
+
+        .stat-number {
+            font-size: 48px;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            margin-bottom: 8px;
+        }
+
+        /* Logo */
+        .logo-mark {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #5B8FF9 0%, #00C9FF 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 0.8s ease-out forwards;
+        }
+
+        /* Tag */
+        .tag {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            background: #F0F0F0;
+            color: #666;
+        }
+
+        .tag-highlight {
+            background: linear-gradient(135deg, rgba(91, 143, 249, 0.15), rgba(0, 201, 255, 0.15));
+            color: #5B8FF9;
+        }
+
+        /* Section spacing */
+        .section {
+            padding: 120px 0;
+        }
+
+        .section-compact {
+            padding: 80px 0;
+        }
+    </style>
+</head>
+<body class="antialiased">
+    <!-- Navigation -->
+    <nav class="nav-container">
+        <div class="max-w-7xl mx-auto px-8 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="logo-mark">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                        </svg>
+                    </div>
+                    <span class="text-xl font-bold">联核通元</span>
+                </div>
+                <div class="flex items-center gap-6">
+                    <a href="model-marketplace.html" class="text-sm font-medium text-gray-700 hover:text-black transition-colors">模型广场</a>
+                    <a href="#pricing" class="text-sm font-medium text-gray-700 hover:text-black transition-colors">定价</a>
+                    <a href="#docs" class="text-sm font-medium text-gray-700 hover:text-black transition-colors">文档</a>
+                    <a href="model-marketplace.html" class="btn-primary">开始使用</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="section hero-gradient" style="padding-top: 180px;">
+        <div class="max-w-7xl mx-auto px-8">
+            <div class="text-center max-w-4xl mx-auto mb-16">
+                <div class="mb-6">
+                    <span class="tag tag-highlight">全新发布：DeepSeek-V3 & Qwen2.5 系列模型</span>
+                </div>
+                <h1 class="hero-title mb-6">
+                    企业级<span class="gradient-text">大语言模型</span><br/>服务平台
+                </h1>
+                <p class="text-xl text-gray-600 mb-10 leading-relaxed max-w-3xl mx-auto">
+                    汇聚全球顶尖AI模型能力，提供统一API接口。助力企业快速构建智能应用，释放AI生产力。
+                </p>
+                <div class="flex items-center justify-center gap-4">
+                    <a href="model-marketplace.html" class="btn-primary">
+                        探索模型广场
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+                        </svg>
+                    </a>
+                    <a href="#" class="btn-secondary">
+                        查看文档
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Stats -->
+            <div class="grid grid-cols-4 gap-8 max-w-4xl mx-auto py-12 border-t border-b border-gray-200">
+                <div class="stat-item">
+                    <div class="stat-number gradient-text">100+</div>
+                    <div class="text-sm text-gray-600 font-medium">顶级AI模型</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number gradient-text">10M+</div>
+                    <div class="text-sm text-gray-600 font-medium">日均API调用</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number gradient-text">50K+</div>
+                    <div class="text-sm text-gray-600 font-medium">企业用户</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number gradient-text">99.9%</div>
+                    <div class="text-sm text-gray-600 font-medium">SLA可用性</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Models -->
+    <section class="section-compact bg-gray-50">
+        <div class="max-w-7xl mx-auto px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold mb-4">精选模型能力</h2>
+                <p class="text-lg text-gray-600">覆盖文本、图像、视频、音频全模态AI能力</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- 大语言模型 -->
+                <div class="model-card">
+                    <div class="mb-6">
+                        <span class="tag tag-highlight mb-3 inline-block">🔥 最热门</span>
+                        <h3 class="text-2xl font-bold mb-3">大语言模型</h3>
+                        <p class="text-gray-600 leading-relaxed">
+                            DeepSeek-V3、Qwen2.5、Claude、GPT-4等顶级LLM，支持对话、代码生成、文档处理、知识问答等场景
+                        </p>
+                    </div>
+                    <div class="mb-6">
+                        <div class="text-xs text-gray-500 mb-2">代表模型</div>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="tag">DeepSeek-V3</span>
+                            <span class="tag">Qwen2.5-72B</span>
+                            <span class="tag">GLM-4</span>
+                        </div>
+                    </div>
+                    <a href="model-marketplace.html" class="text-sm font-semibold hover:underline inline-flex items-center gap-1">
+                        查看全部模型
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </a>
+                </div>
+
+                <!-- 图像生成 -->
+                <div class="model-card">
+                    <div class="mb-6">
+                        <span class="tag mb-3 inline-block">🎨 创意工具</span>
+                        <h3 class="text-2xl font-bold mb-3">图像生成</h3>
+                        <p class="text-gray-600 leading-relaxed">
+                            FLUX、Stable Diffusion、Midjourney等专业图像生成模型，支持文生图、图生图、风格迁移
+                        </p>
+                    </div>
+                    <div class="mb-6">
+                        <div class="text-xs text-gray-500 mb-2">代表模型</div>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="tag">FLUX.1</span>
+                            <span class="tag">SD XL</span>
+                            <span class="tag">Qwen-Image</span>
+                        </div>
+                    </div>
+                    <a href="image-generation.html" class="text-sm font-semibold hover:underline inline-flex items-center gap-1">
+                        开始创作
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </a>
+                </div>
+
+                <!-- 视频生成 -->
+                <div class="model-card">
+                    <div class="mb-6">
+                        <span class="tag mb-3 inline-block">🎬 新能力</span>
+                        <h3 class="text-2xl font-bold mb-3">视频生成</h3>
+                        <p class="text-gray-600 leading-relaxed">
+                            文本生成视频、图片生成视频，AI驱动的视频创作工具，适用于营销、教育、娱乐等场景
+                        </p>
+                    </div>
+                    <div class="mb-6">
+                        <div class="text-xs text-gray-500 mb-2">应用场景</div>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="tag">短视频</span>
+                            <span class="tag">广告创意</span>
+                            <span class="tag">动画制作</span>
+                        </div>
+                    </div>
+                    <a href="video-generation.html" class="text-sm font-semibold hover:underline inline-flex items-center gap-1">
+                        立即体验
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </a>
+                </div>
+
+                <!-- 语音合成 -->
+                <div class="model-card">
+                    <div class="mb-6">
+                        <span class="tag mb-3 inline-block">🎙️ 语音技术</span>
+                        <h3 class="text-2xl font-bold mb-3">语音合成</h3>
+                        <p class="text-gray-600 leading-relaxed">
+                            高质量语音合成、语音克隆、情感表达，支持多语言、多音色，适用于有声读物、客服等场景
+                        </p>
+                    </div>
+                    <div class="mb-6">
+                        <div class="text-xs text-gray-500 mb-2">支持语言</div>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="tag">中文</span>
+                            <span class="tag">英文</span>
+                            <span class="tag">多语言</span>
+                        </div>
+                    </div>
+                    <a href="voice-synthesis.html" class="text-sm font-semibold hover:underline inline-flex items-center gap-1">
+                        试听demo
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </a>
+                </div>
+
+                <!-- 模型微调 -->
+                <div class="model-card">
+                    <div class="mb-6">
+                        <span class="tag mb-3 inline-block">⚙️ 企业定制</span>
+                        <h3 class="text-2xl font-bold mb-3">模型微调</h3>
+                        <p class="text-gray-600 leading-relaxed">
+                            基于开源模型进行专属微调，使用私有数据训练，打造符合业务场景的定制化AI模型
+                        </p>
+                    </div>
+                    <div class="mb-6">
+                        <div class="text-xs text-gray-500 mb-2">支持方式</div>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="tag">LoRA</span>
+                            <span class="tag">全参数</span>
+                            <span class="tag">P-Tuning</span>
+                        </div>
+                    </div>
+                    <a href="model-finetuning.html" class="text-sm font-semibold hover:underline inline-flex items-center gap-1">
+                        创建任务
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </a>
+                </div>
+
+                <!-- AI智能体 -->
+                <div class="model-card">
+                    <div class="mb-6">
+                        <span class="tag mb-3 inline-block">🤖 智能应用</span>
+                        <h3 class="text-2xl font-bold mb-3">AI智能体</h3>
+                        <p class="text-gray-600 leading-relaxed">
+                            构建自主决策的AI Agent，结合工具调用、知识库检索，实现复杂任务自动化处理
+                        </p>
+                    </div>
+                    <div class="mb-6">
+                        <div class="text-xs text-gray-500 mb-2">典型应用</div>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="tag">智能客服</span>
+                            <span class="tag">数据分析</span>
+                            <span class="tag">工作流</span>
+                        </div>
+                    </div>
+                    <a href="ai-agents.html" class="text-sm font-semibold hover:underline inline-flex items-center gap-1">
+                        了解更多
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Platform Features -->
+    <section class="section">
+        <div class="max-w-7xl mx-auto px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold mb-4">为什么选择联核通元</h2>
+                <p class="text-lg text-gray-600">专业、可靠、易用的企业级AI服务</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div class="feature-item">
+                    <div class="text-4xl mb-4">⚡</div>
+                    <h4 class="text-lg font-bold mb-3">极致性能</h4>
+                    <p class="text-gray-600 text-sm leading-relaxed">
+                        分布式GPU集群，毫秒级响应，智能负载均衡，保障服务稳定性
+                    </p>
+                </div>
+
+                <div class="feature-item">
+                    <div class="text-4xl mb-4">🔒</div>
+                    <h4 class="text-lg font-bold mb-3">安全合规</h4>
+                    <p class="text-gray-600 text-sm leading-relaxed">
+                        数据加密传输，权限精细管理，通过ISO27001、等保三级认证
+                    </p>
+                </div>
+
+                <div class="feature-item">
+                    <div class="text-4xl mb-4">🔌</div>
+                    <h4 class="text-lg font-bold mb-3">统一接口</h4>
+                    <p class="text-gray-600 text-sm leading-relaxed">
+                        OpenAI兼容API，一套代码调用所有模型，降低集成成本
+                    </p>
+                </div>
+
+                <div class="feature-item">
+                    <div class="text-4xl mb-4">💰</div>
+                    <h4 class="text-lg font-bold mb-3">灵活计费</h4>
+                    <p class="text-gray-600 text-sm leading-relaxed">
+                        按需付费，预付费优惠，企业专属套餐，成本可控透明
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Use Cases -->
+    <section class="section-compact bg-gray-50">
+        <div class="max-w-7xl mx-auto px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold mb-4">广泛应用场景</h2>
+                <p class="text-lg text-gray-600">助力各行业数字化转型与智能化升级</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="feature-item">
+                    <h4 class="text-lg font-bold mb-3">💼 企业办公</h4>
+                    <p class="text-gray-600 text-sm leading-relaxed">
+                        智能客服、文档撰写、会议纪要、邮件生成、数据分析报告
+                    </p>
+                </div>
+
+                <div class="feature-item">
+                    <h4 class="text-lg font-bold mb-3">🛒 电商零售</h4>
+                    <p class="text-gray-600 text-sm leading-relaxed">
+                        商品描述生成、智能推荐、客户服务、营销文案、用户画像分析
+                    </p>
+                </div>
+
+                <div class="feature-item">
+                    <h4 class="text-lg font-bold mb-3">🎨 内容创作</h4>
+                    <p class="text-gray-600 text-sm leading-relaxed">
+                        文章写作、图片设计、视频制作、短视频脚本、自媒体运营
+                    </p>
+                </div>
+
+                <div class="feature-item">
+                    <h4 class="text-lg font-bold mb-3">🎓 教育培训</h4>
+                    <p class="text-gray-600 text-sm leading-relaxed">
+                        智能问答、作业批改、课程生成、学习辅导、知识总结
+                    </p>
+                </div>
+
+                <div class="feature-item">
+                    <h4 class="text-lg font-bold mb-3">💻 软件开发</h4>
+                    <p class="text-gray-600 text-sm leading-relaxed">
+                        代码生成、Bug修复、代码审查、技术文档、单元测试
+                    </p>
+                </div>
+
+                <div class="feature-item">
+                    <h4 class="text-lg font-bold mb-3">🎮 游戏娱乐</h4>
+                    <p class="text-gray-600 text-sm leading-relaxed">
+                        NPC对话、剧情生成、场景描述、游戏策划、个性化推荐
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="section" style="background: #1a1a1a; color: white;">
+        <div class="max-w-4xl mx-auto px-8 text-center">
+            <h2 class="text-5xl font-bold mb-6">准备好开始了吗？</h2>
+            <p class="text-xl text-gray-400 mb-10">
+                立即注册，获取免费API额度，体验顶级AI模型能力
+            </p>
+            <div class="flex items-center justify-center gap-4">
+                <a href="model-marketplace.html" style="background: white; color: #1a1a1a;" class="px-8 py-4 rounded-xl font-semibold hover:bg-gray-100 transition-all inline-flex items-center gap-2">
+                    探索模型广场
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+                    </svg>
+                </a>
+                <a href="#" style="border: 2px solid #404040; color: white;" class="px-8 py-4 rounded-xl font-semibold hover:bg-gray-900 transition-all inline-flex items-center gap-2">
+                    查看文档
+                </a>
+            </div>
+
+            <div class="mt-16 pt-12 border-t border-gray-800 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="logo-mark">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                        </svg>
+                    </div>
+                    <span class="font-bold text-lg">联核通元</span>
+                </div>
+                <div class="flex items-center gap-6 text-sm text-gray-400">
+                    <a href="#" class="hover:text-white transition-colors">关于我们</a>
+                    <a href="#" class="hover:text-white transition-colors">服务条款</a>
+                    <a href="#" class="hover:text-white transition-colors">隐私政策</a>
+                    <a href="#" class="hover:text-white transition-colors">联系我们</a>
+                </div>
+            </div>
+            <div class="mt-8 text-sm text-gray-500">
+                © 2025 联核通元 LINAHE ONE. All rights reserved.
+            </div>
+        </div>
+    </section>
+
+</body>
+</html>
